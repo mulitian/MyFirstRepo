@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.OrdersMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.domain.pojo.Orders">
+            <id property="orderid" column="orderId" jdbcType="INTEGER"/>
+            <result property="orderdate" column="orderDate" jdbcType="DATE"/>
+            <result property="userid" column="userId" jdbcType="VARCHAR"/>
+            <result property="hpid" column="hpId" jdbcType="INTEGER"/>
+            <result property="smid" column="smId" jdbcType="INTEGER"/>
+            <result property="state" column="state" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        orderId,orderDate,userId,
+        hpId,smId,state
+    </sql>
+
+<!--   不要在sql中带注解 -->
+<!--    o.orderId AS orderid  前面是数据库字段名  后面是vo-->
+<!--    下面where的条件则是userquery-->
+    <select id="selectOrdersByConditions" resultType="com.example.domain.vo.OrderVo">
+        SELECT
+        o.orderId AS orderid,
+        u.userId AS userid,
+        u.realName AS realname,
+        u.sex AS sex,
+        h.name AS hpname,
+        sm.name AS sname,
+        o.orderDate AS orderdate,
+        o.state As state
+        FROM
+        orders o
+        LEFT JOIN
+        users u ON o.userId = u.userId
+        LEFT JOIN
+        hospital h ON o.hpId = h.hpId
+        LEFT JOIN
+        setmeal sm ON o.smId = sm.smId
+        <where>
+            <if test="userQuery.userid != null and userQuery.userid != ''">
+                AND o.userId = #{userQuery.userid}
+            </if>
+            <if test="userQuery.realname != null and userQuery.realname != ''">
+                AND u.realName = #{userQuery.realname}
+            </if>
+            <if test="userQuery.sex != null">
+                AND u.sex = #{userQuery.sex}
+            </if>
+            <if test="userQuery.smid != null">
+                AND o.smId = #{userQuery.smid}
+            </if>
+            <if test="userQuery.orderdate != null">
+                AND o.orderDate = #{userQuery.orderdate,jdbcType=DATE}
+            </if>
+            <if test="userQuery.state != null">
+                AND o.state = #{userQuery.state}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="selectAllOrders" resultType="com.example.domain.vo.OrderVo">
+        SELECT
+        o.orderId AS orderid,
+        u.userId AS userid,
+        u.realName AS realname,
+        u.sex AS sex,
+        h.name AS hpname,
+        sm.name AS sname,
+        o.orderDate AS orderdate,
+        o.state As state
+        FROM
+        orders o
+        LEFT JOIN
+        users u ON o.userId = u.userId
+        LEFT JOIN
+        hospital h ON o.hpId = h.hpId
+        LEFT JOIN
+        setmeal sm ON o.smId = sm.smId
+    </select>
+
+</mapper>
