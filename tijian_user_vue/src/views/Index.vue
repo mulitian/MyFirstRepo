@@ -22,7 +22,7 @@
           <img src="../assets/img/menu01.png" />
           <div class="nav-item-text">
             <h3>免费咨询</h3>
-            <p>新型冠状病毒肺炎</p>
+            <p>AI智能问诊</p>
           </div>
         </li>
         <li>
@@ -53,10 +53,10 @@
             <p>网上购买上门服务</p>
           </div>
         </li>
-        <li>
+        <li @click="toAppointment">
           <img src="../assets/img/menu06.png" />
           <div class="nav-item-text">
-            <h3 @click="toAppointment">团检预约</h3>
+            <h3>团检预约</h3>
             <p>团体体检套餐定制</p>
           </div>
         </li>

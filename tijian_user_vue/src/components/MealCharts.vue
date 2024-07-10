@@ -1,19 +1,34 @@
-<template>  
-  <div>  
-    <div ref="barChart" style="width: 92.8vw;height:400px;"></div>  
-    <div ref="pieChart" style="width: 92.8vw;height:400px;margin-top: 20px;"></div>  
-  </div>  
+<template>
+  <div>
+    <!-- <p>Sex: {{ sex }}</p>
+    <p>HP ID: {{ hpId }}</p> -->
+    <div ref="barChart" style="width: 92.8vw; height: 400px"></div>
+    <div
+      ref="pieChart"
+      style="width: 92.8vw; height: 400px; margin-top: 20px"
+    ></div>
+  </div>
 </template>  
   
 <script>  
 import axios from 'axios';  
 import * as echarts from 'echarts';  
   
-export default {  
+export default {
+  props: {  
+    sex: {  
+      type: Number,  
+      required: true, // 假设这个 prop 是必需的  
+    },  
+    hpId: {  
+      type: Number,  
+      required: true, // 假设这个 prop 也是必需的  
+    },  
+  },   
   data() {  
-    return {  
+    return {
       barChart: null,  
-      pieChart: null,  
+      pieChart: null,
     };  
   }, 
   mounted() {  
@@ -26,9 +41,10 @@ export default {
   }, 
   methods: {  
     fetchData() {  
-      axios.get('http://localhost:8080/echarts/getHpsData')  
+      axios.get(`http://localhost:8080/echarts/getMealsData?hpId=${this.hpId}&type=${this.sex}`)  
         .then(response => {  
           if (response.data.code === 200) {  
+            console.log(response.data);
             this.drawBarChart(response.data.result);  
             this.drawPieChart(response.data.result);  
           }  
@@ -97,5 +113,5 @@ export default {
 };  
 </script>  
   
-<style scoped>  
+<style scoped>
 </style>

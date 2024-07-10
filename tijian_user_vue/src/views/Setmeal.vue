@@ -22,13 +22,11 @@
           :class="{ 'transform-up': isChartVisible }"
           style="margin-left: 175px"
         >
-          <!-- 使用v-if和v-else-if根据条件渲染不同的图标 -->
           <ArrowRight v-if="!isChartVisible" />
           <ArrowDown v-else />
         </el-icon>
 
-        <!-- 使用v-show根据isChartVisible的值来控制Hpcharts的显示 -->
-        <MealCharts v-show="isChartVisible"></MealCharts>
+        <MealCharts v-show="isChartVisible" :sex="sex" :hp-id="hpId"></MealCharts>
       </li>
       <li v-for="setmeal in setmeals" :key="setmeal.smid">
         <div class="item">
@@ -70,7 +68,7 @@
 import Footer from "../components/Footer.vue";
 import LastPage from "@/components/LastPage.vue";
 import MealCharts from "@/components/MealCharts.vue";
-import { ref, reactive, toRefs, onMounted } from "vue";
+import { ref, reactive, toRefs, onMounted, onBeforeMount } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { setSessionStorage, getSessionStorage } from "../common.js";
 import axios from "axios";
@@ -83,6 +81,7 @@ const hpId = route.query.hpId;
 const setmeals = ref([]); // 使用 ref 创建一个响应式引用
 const checkitems = ref([]);
 const user = ref();
+const sex = ref();
 
 const isChartVisible = ref(false);
 function toggleChart() {
@@ -94,8 +93,9 @@ function init() {
   console.log("-----------套餐列表---------");
   // console.log(token);
   user.value = getSessionStorage("user");
+  sex.value = user.value.sex;
   console.log(user.value);
-  console.log(user.value.sex);
+  console.log(sex.value);
   // axios.get(`http://10.25.161.174:8080/getSetmeals?type=${user.sex}`).then(res => {
   axios
     .get(`http://localhost:8080/getSetmeals?type=${user.value.sex}`, {
@@ -143,7 +143,7 @@ function toSelectdate(setmeal) {
   });
 }
 
-onMounted(init);
+onBeforeMount(init);
 </script>
 
 

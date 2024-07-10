@@ -17,12 +17,12 @@ import java.util.Date;
 import java.util.List;
 
 /**
-* @author liwenxuan
-* @description 针对表【orders】的数据库操作Service实现
-* @createDate 2024-06-13 12:05:42
-*/
+ * @author liwenxuan
+ * @description 针对表【orders】的数据库操作Service实现
+ * @createDate 2024-06-13 12:05:42
+ */
 @Service
-public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> implements OrdersService{
+public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> implements OrdersService {
 
     @Autowired
     public OrdersMapper ordersMapper;
@@ -53,18 +53,18 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     public Integer addOrder(Orders orders) {
 
         String[] hospitalRules = hospitalMapper.selectById(orders.getHpid()).getRule().split(",");
-        int maximum =  Integer.valueOf(hospitalRules[LocalDate.now().getDayOfWeek().getValue()]);
+        int maximum = Integer.valueOf(hospitalRules[LocalDate.now().getDayOfWeek().getValue()]);
 
-        synchronized (this){
-            if(ordersMapper.selectCount(new QueryWrapper<Orders>().eq("orderDate",orders.getOrderid())) <= maximum)
-                if(ordersMapper.selectCount(new QueryWrapper<Orders>().eq("orderDate",orders.getOrderid())) <= maximum){
+        synchronized (this) {
+            if (ordersMapper.selectCount(new QueryWrapper<Orders>().eq("orderDate", orders.getOrderid())) <= maximum)
+                if (ordersMapper.selectCount(new QueryWrapper<Orders>().eq("orderDate", orders.getOrderid())) <= maximum) {
                     orders.setState(1);
                     ordersMapper.insert(orders);
                 }
         }
 
         List<Integer> ciIds = setmealdetailedMapper.getClidIds(orders.getSmid());
-        for(Integer ciId : ciIds){
+        for (Integer ciId : ciIds) {
             Checkitem checkitem = checkitemMapper.selectById(ciId);
             Cireport cireport = new Cireport();
             cireport.setCiid(ciId);
@@ -73,7 +73,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
             cireportMapper.insert(cireport);
 
             List<Integer> cdIds = checkitemdetailedMapper.getCdIdIds(ciId);
-            for(Integer cdId : cdIds){
+            for (Integer cdId : cdIds) {
                 Checkitemdetailed checkitemdetailed = checkitemdetailedMapper.selectById(cdId);
                 Cidetailedreport cidetailedreport = new Cidetailedreport();
                 cidetailedreport.setName(checkitemdetailed.getName());
@@ -93,49 +93,49 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     }
 
     @Override
-    public List<OrdersList> getByUserId(String userId) {
+    public List<OrdersList> getByUserId(String userId, Integer state) {
         List<OrdersList> ordersList = new ArrayList<>();
-        QueryWrapper<Orders> queryWrapper = new QueryWrapper<Orders>().eq("userId",userId);
+        QueryWrapper<Orders> queryWrapper = new QueryWrapper<Orders>().eq("userId", userId).orderByDesc("orderDate").eq("state", state);
         List<Orders> orders = ordersMapper.selectList(queryWrapper);
-        for(Orders order : orders){
-            ordersList.add(new OrdersList(order,setmealMapper.selectById(order.getSmid())));
+        for (Orders order : orders) {
+            ordersList.add(new OrdersList(order, setmealMapper.selectById(order.getSmid())));
         }
         return ordersList;
     }
 
     @Override
     public int findByUserId(String userId) {
-        QueryWrapper<Orders> queryWrapper = new QueryWrapper<Orders>().eq("userId",userId).eq("orderDate",2);
+        QueryWrapper<Orders> queryWrapper = new QueryWrapper<Orders>().eq("userId", userId).eq("orderDate", 2);
         return Math.toIntExact(ordersMapper.selectCount(queryWrapper));
     }
 
     @Override
     public int countByHpId(Integer hpId) {
-        QueryWrapper<Orders> queryWrapper = new QueryWrapper<Orders>().eq("hpid",hpId);
+        QueryWrapper<Orders> queryWrapper = new QueryWrapper<Orders>().eq("hpid", hpId);
         return Math.toIntExact(ordersMapper.selectCount(queryWrapper));
     }
 
     @Override
     public int countByHpIdAndMealId(Integer hpId, Integer mealId) {
-        QueryWrapper<Orders> queryWrapper = new QueryWrapper<Orders>().eq("hpid",hpId).eq("smid",mealId);
+        QueryWrapper<Orders> queryWrapper = new QueryWrapper<Orders>().eq("hpid", hpId).eq("smid", mealId);
         return Math.toIntExact(ordersMapper.selectCount(queryWrapper));
     }
 
     @Override
     public List<Orders> getOrderResult(String userId) {
-        QueryWrapper<Orders> queryWrapper = new QueryWrapper<Orders>().eq("userId",userId).eq("state",3);
+        QueryWrapper<Orders> queryWrapper = new QueryWrapper<Orders>().eq("userId", userId).eq("state", 3);
         List<Orders> orders = ordersMapper.selectList(queryWrapper);
-        for (Orders order : orders){
+        for (Orders order : orders) {
             order.setHospitalName(hospitalMapper.selectById(order.getHpid()).getName());
         }
         return orders;
     }
 
     @Scheduled(cron = "0 0 18 * * ?")
-    public void clear(){
-        List<Orders> orders = ordersMapper.selectList(new QueryWrapper<Orders>().eq("state",1).eq("state",0));
-        for(Orders order : orders){
-            if(order.getOrderdate().isBefore(LocalDate.now())){
+    public void clear() {
+        List<Orders> orders = ordersMapper.selectList(new QueryWrapper<Orders>().eq("state", 1).eq("state", 0));
+        for (Orders order : orders) {
+            if (order.getOrderdate().isBefore(LocalDate.now())) {
                 order.setState(4);
                 ordersMapper.updateById(order);
             }

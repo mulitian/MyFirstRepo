@@ -91,8 +91,8 @@ public class OrdersController {
     }
 
     @GetMapping("/getOrdersByUserId")
-    public Response getOrdersByUserId(String userId) {
-        List<OrdersList> orders = ordersService.getByUserId(userId);
+    public Response getOrdersByUserId(String userId, Integer state) {
+        List<OrdersList> orders = ordersService.getByUserId(userId, state);
         if (orders != null) {
             return Response.success(orders);
         } else return Response.error("查询失败");

@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from '../views/Login.vue'
-import Logon from '../views/Logon.vue'
+import MyLogin from '../views/MyLogin.vue'
+import ForgetPw from '../views/ForgetPw.vue'
 import OC from '../views/OrdersContent.vue'
 import OL from '../views/OrdersList.vue'
+import ChartView from '../views/ChartsView.vue'
 
 
 const router = createRouter({
@@ -11,8 +12,13 @@ const router = createRouter({
     {
       path: '/',
       name: 'Login',
-      component: Logon
+      component: MyLogin
     },
+    // {
+    //   path: '/forgetpw',
+    //   name: 'forgetpw',
+    //   component: ForgetPw
+    // },
     {
       path: '/ordersList',
       name: 'ordersList',
@@ -22,6 +28,11 @@ const router = createRouter({
       path: '/ordersContent',
       name: 'ordersContent',
       component: OC
+    },
+    {
+      path: '/charts',
+      name: 'Charts',
+      component: ChartView
     }
   ]
 })

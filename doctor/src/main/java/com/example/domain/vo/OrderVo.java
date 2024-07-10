@@ -23,34 +23,20 @@ import java.util.Date;
  */
 @Data
 public class OrderVo {
+    //订单id
     private Integer orderid;
+    //用户id
     private String userid;
+    //用户姓名
     private String realname;
+    //性别
     private Integer sex;
+    //医院
     private String hpname;
     //套餐类型
     private String sname;
-
+    //预约时间
     private Date orderdate;
+    //预约状态
     private Integer state;
-
-//    private Integer orderid;
-//
-//    private Date orderdate;
-//
-//    private String userid;
-//
-//    private Integer hpid;
-//
-//    private Integer smid;
-//
-//    private Integer state;
-//
-//    private Users user;
-//
-//    private Hospital hospital;
-//
-//    private Setmeal setmeal;
-
-
 }

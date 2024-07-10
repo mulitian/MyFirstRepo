@@ -15,7 +15,7 @@ public interface OrdersService extends IService<Orders> {
 
     public Integer addOrder(Orders orders);
 
-    public List<OrdersList> getByUserId(String userId);
+    public List<OrdersList> getByUserId(String userId, Integer state);
 
     public int findByUserId(String userId);
 

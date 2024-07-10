@@ -7,6 +7,13 @@
       <div></div>
     </header>
     <div class="top-ban"></div>
+    
+    <div class="button-group">  
+      <button @click="setState(1)" :class="{ 'active': curState === 1 }">未开始</button>  
+      <button @click="setState(2)" :class="{ 'active': curState === 2 }">进行中</button>  
+      <button @click="setState(0)" :class="{ 'active': curState === 0 }">已取消</button>  
+      <button @click="setState(3)" :class="{ 'active': curState === 3 }">已完成</button>  
+    </div>  
 
     <ul>
       <li v-for="(item, index) in list.data" :key="index">
@@ -25,7 +32,7 @@
           <div @click="toApp(index)">重新预约</div>
           <!-- <div @click="delApp(index)">删除记录</div> -->
         </div>
-        <div class="right" v-if="item.orders.state === 3">已归档</div>
+        <div class="right" v-if="item.orders.state === 3">已完成</div>
       </li>
     </ul>
 
@@ -46,6 +53,13 @@ const route = useRoute();
 
 const user = getSessionStorage("user");
 const list = reactive({});
+const curState = ref(1);
+
+function setState(state) {  
+  curState.value = state; 
+  // console.log(curState.value);
+  getOrdersByUserId();
+}  
 
 function getOrdersByUserId() {
   const token = getSessionStorage("token");
@@ -54,6 +68,7 @@ function getOrdersByUserId() {
     .get("http://localhost:8080/getOrdersByUserId", {
       params: {
         userId: user.userid,
+        state: curState.value
       },
       headers: {
         Authorization: `${token}`,
@@ -125,6 +140,32 @@ onMounted(getOrdersByUserId);
 </script>
 
 <style scoped>
+.button-group {
+  /* padding: 10px; */
+  display: flex;
+  justify-content: space-between;
+
+  background-color: #f0f0f0;
+}
+
+.button-group button{
+  flex-grow: 1;
+
+  padding: 15px 10px;
+  justify-content: center;
+
+  color: #333
+}
+
+.button-group button.active{
+  padding: 10px 15px;
+  justify-content: center;
+
+  color:#f5f5f5;
+  background-color: #5e5e5e;
+}
+
+
 /*********************** 总容器 ***********************/
 .wrapper {
   width: 100%;

@@ -4,10 +4,10 @@
       <TopBar></TopBar>
     </el-header>
     <el-drawer v-model="drawer" title="I am the title" :with-header="false">
-    <span>Hi there!</span>
+      <span>Hi there!</span>
     </el-drawer>
     <el-container>
-      <el-aside width="260px">
+      <!-- <el-aside width="260px">
         <h4>体检用户查询</h4>
         <el-form ref="formRef" :model="selectForm" label-width="auto">
           <el-form-item label="手机号码">
@@ -59,6 +59,9 @@
             <el-button type="warning" @click="reset">重置</el-button>
           </el-form-item>
         </el-form>
+      </el-aside> -->
+      <el-aside width="260px" style="padding: 0px;">
+        <SideBar :selectForm="selectForm" @update-orders="handleUpdateOrders" ></SideBar>
       </el-aside>
       <el-main>
         <el-table :data="ordersPageResponseDto.list" style="width: 100%">
@@ -75,8 +78,13 @@
           <el-table-column prop="orderdate" label="体检日期" />
           <el-table-column label="操作" width="120">
             <template #default="scope">
-              <el-button type="text" size="small" @click="ciReport(scope.row)"
-                >{{scope.row.state!=3?'编辑体检报告':'查看体检报告'}}</el-button
+              <el-button
+                type="text"
+                size="small"
+                @click="ciReport(scope.row)"
+                >{{
+                  scope.row.state != 3 ? "编辑体检报告" : "查看体检报告"
+                }}</el-button
               >
             </template>
           </el-table-column>
@@ -96,140 +104,158 @@
 </template>
 
 <script setup>
-
-import { reactive, toRefs, ref} from "vue";
+import { reactive, toRefs, ref, provide } from "vue";
 import { useRouter } from "vue-router";
 import { getSessionStorage } from "../common.js";
 import axios from "axios";
 
-import TopBar from "../components/TopBar.vue"
+import TopBar from "../components/TopBar.vue";
+import SideBar from "@/components/SideBar.vue";
 
 // axios.defaults.baseURL = "http://10.25.161.184:8079/order/";
-  axios.defaults.baseURL = "http://localhost:8079/order/";
+axios.defaults.baseURL = "http://localhost:8079/order/";
 const router = useRouter();
 
 const doctor = ref();
 const avatar = ref("src/img/morentouxiang.png");
 const drawer = ref(false);
 
+const setmealArr = ref();
+
 const selectForm = reactive({
-    userid: "",
-    realname: "",
-    sex: "",
-    smid: "",
-    orderdate: "",
-    state: "1",
+  userid: "",
+  realname: "",
+  sex: "",
+  smid: "",
+  orderdate: "",
+  state: "1",
 });
 
 const selectPage = reactive({
-    pageNum: 1,
-    maxPageSize: 10,
-    total: 20,
-})
+  pageNum: 1,
+  maxPageSize: 10,
+  total: 20,
+});
 
 const ordersPageResponseDto = reactive({
   list: [],
 });
-const setmealArr = ref();
 
-const formatDate = (dateStr) => {  
-    let date = new Date(dateStr);  
-    let year = date.getFullYear();  
-    let month = String(date.getMonth() + 1).padStart(2, '0'); // 月份是从0开始的，所以要+1  
-    let day = String(date.getDate()).padStart(2, '0');  
-    return `${year}-${month}-${day}`;  
-}
+// 提供给子组件需要的数据和方法  
+provide('ordersPageResponseDto', ordersPageResponseDto);  
+provide('selectPage', selectPage);  
+
+function handleUpdateOrders(newOrders, total) {  
+  ordersPageResponseDto.value.list = newOrders;  
+  selectPage.value.total = total;  
+}  
+
+
+const formatDate = (dateStr) => {
+  let date = new Date(dateStr);
+  let year = date.getFullYear();
+  let month = String(date.getMonth() + 1).padStart(2, "0"); // 月份是从0开始的，所以要+1
+  let day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 const times = () => {
   let list = ordersPageResponseDto.list;
-  for(let i=0; i<list.length; i++){
+  for (let i = 0; i < list.length; i++) {
     ordersPageResponseDto.list[i].orderdate = formatDate(list[i].orderdate);
   }
-}
+};
 
 const getOrderList = () => {
-  axios.get("getAllOrders",{
-    params : {
-      pageNum : selectPage.pageNum,
-      pageSize : selectPage.maxPageSize,
-    }
-  }).then((response) => {
-    console.log(response.data);
-    console.log(response.data.result);
-    ordersPageResponseDto.list = response.data.result.list;
-    selectPage.total = response.data.result.total;
-    times();
-  })
-  .catch((error) => {
-    console.error(error);
-  });
-}
+  axios
+    .get("getAllOrders", {
+      params: {
+        pageNum: selectPage.pageNum,
+        pageSize: selectPage.maxPageSize,
+      },
+    })
+    .then((response) => {
+      console.log(response.data);
+      console.log(response.data.result);
+      ordersPageResponseDto.list = response.data.result.list;
+      selectPage.total = response.data.result.total;
+      times();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
 
 const init = () => {
   doctor.value = getSessionStorage("doctor");
   console.log(doctor.value);
-  axios.get("querySmType").then((response) => {
-    console.log(response.data);
-    setmealArr.value = response.data.result;
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+  axios
+    .get("querySmType")
+    .then((response) => {
+      console.log(response.data);
+      setmealArr.value = response.data.result;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   getOrderList();
-}
+};
 
 const currentChange = (pageNum) => {
   selectPage.pageNum = pageNum;
   query();
-}
+};
 
 init();
 
 const ciReport = (row) => {
   console.log(row);
-  router.push({ path: '/ordersContent', query: {
-     orderid:  row.orderid,
-     userid: row.userid,
-     realname: row.realname,
-     sex: row.sex,
-     sname: row.sname,
-     state: row.state,
-     orderdate: row.orderdate,
-    } });
-}
+  router.push({
+    path: "/ordersContent",
+    query: {
+      orderid: row.orderid,
+      userid: row.userid,
+      realname: row.realname,
+      sex: row.sex,
+      sname: row.sname,
+      state: row.state,
+      orderdate: row.orderdate,
+    },
+  });
+};
 
 const reset = () => {
-  selectForm.realname = '';
-  selectForm.orderdate = '';
-  selectForm.sex = '';
-  selectForm.smid = '';
-  selectForm.state = '';
-}
+  selectForm.realname = "";
+  selectForm.orderdate = "";
+  selectForm.sex = "";
+  selectForm.smid = "";
+  selectForm.state = "";
+};
 
-const query = () =>{
+const query = () => {
   console.log(selectForm);
-  axios.post("queryOrderList",{
+  axios
+    .post("queryOrderList", {
       userid: selectForm.userid,
       realname: selectForm.realname,
       sex: selectForm.sex,
       smid: selectForm.smid,
       orderdate: selectForm.orderdate,
       state: selectForm.state,
-      pageNum : selectPage.pageNum,
-      pageSize : selectPage.maxPageSize,
-  }).then((response) => {
-    console.log(response.data);
-    console.log(response.data.result);
-    ordersPageResponseDto.list = response.data.result.list;
-    selectPage.total = response.data.result.total;
-    times();
-  })
-  .catch((error) => {
-    console.error(error);
-  });
-}
-
-
+      pageNum: selectPage.pageNum,
+      pageSize: selectPage.maxPageSize,
+    })
+    .then((response) => {
+      console.log(response.data);
+      console.log(response.data.result);
+      ordersPageResponseDto.list = response.data.result.list;
+      selectPage.total = response.data.result.total;
+      times();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
 </script>
 
 <style scoped>

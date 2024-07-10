@@ -16,6 +16,7 @@ import ReportList from '@/views/ReportList.vue'
 import Test from '@/views/Test.vue'
 import Echarts from '@/views/Echarts.vue'
 import Hpcharts from '@/components/Hpcharts.vue'
+import MealCharts from '@/components/MealCharts.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -104,6 +105,11 @@ const router = createRouter({
       path: '/hpcharts',
       name: 'hpcharts',
       component: Hpcharts
+    },
+    {
+      path: '/mlcharts',
+      name: 'mlcharts',
+      component: MealCharts
     }
   ]
 })

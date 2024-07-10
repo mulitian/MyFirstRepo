@@ -1,14 +1,16 @@
 <template>
-  <h1>Neusoft&nbsp;&nbsp;智慧体检医生端管理系统</h1>
-  <div style="display: flex;align-items: center;">
-    <p>医生：{{ doctor.realname }}</p>
-    <div class="user-avatar">
-      <img :src="avatar" alt="用户头像" @click="drawer = true" style="cursor: pointer;">
+  <div class="wrapper">
+    <h1>梁山泊体检中心&nbsp;&nbsp;后台管理系统</h1>
+    <div class="right-part">
+      <p>医生：{{ doctor.realname }}</p>
+      <div class="user-avatar">
+        <img :src="avatar" alt="用户头像" @click="drawer = true" style="cursor: pointer;">
+      </div>
     </div>
+    <el-drawer size="300" v-model="drawer" title="I am the title" :with-header="false">
+      <doctorMenu></doctorMenu>
+    </el-drawer>
   </div>
-  <el-drawer size="300" v-model="drawer" title="I am the title" :with-header="false">
-    <doctorMenu></doctorMenu>
-  </el-drawer>
 </template>
 
 <script setup>
@@ -40,6 +42,18 @@ h1 {
 
 p {
   font-size: 16px;
+}
+
+.wrapper {  
+  display: flex;  
+  justify-content: space-between; /* 使得子元素之间等间距分布，从容器的一端到另一端 */  
+  align-items: center; /* 确保子元素在交叉轴（这里是垂直方向）上居中对齐 */  
+  width: 100%; /* 根据需要设置宽度，这里设为100%以占满容器宽度 */  
+}  
+
+.wrapper .right-part {
+  display: flex;
+  align-items: center;
 }
 
 .user-avatar {
